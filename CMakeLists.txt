@@ -12,7 +12,17 @@ set(SOURCE_METADATA ${SOURCE_ROOT}/MetaData)
 set(SOURCE_SYSTEM ${SOURCE_ROOT}/System)
 
 # Compiler warning and optimization flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+if(WIN32)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W3")
+  set(variables CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE)
+  foreach(variable ${variables})
+    if(${variable} MATCHES "/MD") # force MSVC static runtime
+      string(REGEX REPLACE "/MD" "/MT" ${variable} "${${variable}}")
+    endif()
+  endforeach()
+else()
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+endif()
 
 if (EMSCRIPTEN)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-warn-absolute-paths")
